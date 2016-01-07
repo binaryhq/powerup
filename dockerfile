@@ -1,0 +1,22 @@
+FROM ubuntu:14.04
+MAINTAINER Gowtham
+
+RUN apt-get update && apt-get install -y openssh-server
+RUN mkdir /var/run/sshd 
+ARG PASS_WORD
+ENV PASS_WORD ${PASS_WORD:-"hostmyname"}
+
+#RUN echo "root:$PASS_WORD" > /var/1
+
+RUN echo "root:$PASS_WORD" | chpasswd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+RUN service ssh start
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
+
