@@ -1,7 +1,4 @@
-ARG DIST_TAG
-ENV DIST_TAG ${DIST_TAG:-"ubuntu:14.04"}
-
-FROM $PASS_WORD
+FROM ubuntu:14.04
 MAINTAINER PowerUpHosting
 
 RUN apt-get update && apt-get install -y openssh-server
@@ -19,7 +16,9 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
-RUN service ssh start
+
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
+
+RUN service ssh start
 
